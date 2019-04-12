@@ -2,7 +2,7 @@
 
 ## Qual o objetivo do comando cache em Spark?
 
-O objetivo do comando .cache() é a otimização de jobs Spark, onde em um contexto de BigData o desafio comum é o uso demasiado da memória, visto que operações de execução longa e tarefas que resultam em operações Cartesianas.  No Spark existem dois tipos de operações sobre RDD Transformação e Ação. As transformações criam um RDD em outro RDD e têm a característica de ser "lazy", isso significa que serão computadas somente quando ação for aplicada no RDD. Entretanto, as ações são operações sobre o RDD, dessa vez não cria um novo  RDD mas agregam os elementos do RDD  usando alguma função e retorna ao driver o resultado final. 
+O objetivo do comando .cache() é a otimização de jobs Spark, onde em um contexto de BigData o desafio comum é o uso demasiado da memória, visto que operações de execução longa e tarefas que resultam em operações Cartesianas.  No Spark existem dois tipos de operações sobre RDD Transforsparko e Ação. As transformações criam um RDD em outro RDD e têm a característica de ser "lazy", isso significa que serão computadas somente quando ação for aplicada no RDD. Entretanto, as ações são operações sobre o RDD, dessa vez não cria um novo  RDD mas agregam os elementos do RDD  usando alguma função e retorna ao driver o resultado final. 
 
 Em um  RDD que não é utilizado o método .cache() o DAG criado pelas transformações será sempre executado a cada nova ação executada no RDD, ocasionado em um retrabalho das execuções. Assim, usando o comando cache o Spark manterá o RDD na memória, tornando as operações mais rápidas.
 
@@ -31,12 +31,37 @@ group.foreach(println)
 
 Entretanto o reduceByKey, existe uma combinação de de chaves identicas é uma partição do cluster, diminuindo a quantidade de dafos, diminuindo o consumo da memória.
 
-Example:
+Exemplo:
 ```
 val words = Array("one","two","two","four","five","six","six","eight","nine","ten")
 val data = spark.sparkContext.parallelize(words).map(w => (w,1)).reduceByKey(_+_)
 data.collect.foreach(println)
 ```
+
+## Explique o que o código Scala abaixo faz.
+
+```
+val textFile = sc.textFile("hdfs://...")
+val counts = textFile.flatMap(line => line.split(" "))
+                 .map(word => (word, 1))
+                 .reduceByKey(_ + _)
+counts.saveAsTextFile("hdfs://...")
+```
+
+A linha: ``val textFile = sc.textFile("hdfs://...")`` cria um RDD a partir de um arquivo de texto armazenado no hdfs.
+Exemplo: A partir de arquivo de texto contendo ``spark semantix spark spark sp spark spark sp approved`` teríamos como resultado o seguinte RDD ``[['spark semantix spark spark sp spark spark sp approved']]``
+
+A linha ``val counts = textFile.flatMap(line => line.split(" "))`` transforma o RDD textFile aplicando a função flatMap, que retorna um array com uma posição e esta linha é submetida a função split(), que separa essas linha por espaço. O resultado final é um novo RDD com as palavras separadas 
+``[['spark','semantix','spark','spark','sp','spark','spark','sp','approved']]``
+
+A linha ``.map(word => (word, 1))`` aplica a função passada como parâmetro da transformando map em cada elemento do RDD resultante do flatMap, produzindo um novo RDD que contém um conjunto de tuplas.
+``[[('spark', 1), ('semantix', 1), ('spark', 1), ('spark', 1), ('sp', 1), ('spark', 1), ('spark', 1), ('sp', 1),('approved', 1)]]``
+
+A linha ``.reduceByKey(_ + _)`` aplica uma ação no RDD acima, a qual combina os elementos com a mesma palavra chave somando os valores e por fim retornando a variável counts um novo RDD como mostrado abaixo que representa a quantidade ocorrências de cada palavra no texto original.
+``[[('semantix', 1)], [('spark', 5), ('sp', 2), ('approved', 1)]]``
+
+Finalmente, a linha ``counts.saveAsTextFile("hdfs://...")`` salva o RDD counts como um arquivo de texto no hdfs.
+
 
 
 
