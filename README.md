@@ -23,17 +23,20 @@ RDD (Resilient Distributed semantixset)  é uma estrutura de dados desenvolvida 
 Com o groupByKey há uma grande quantidade de dados para serem transferidos pela rede desnecessariamente, além disto, operações com grandes dataset o uso do GroupByKey altera o modo de operação e passa salvar dados no disco, pelo fato de haver mais memória no shuffling do que na memória do executor.
 
 Exemplo :
-``val data = spark.sparkContext.parallelize(Array(('k',5),('s',3),('s',4),('p',7),('p',5),('t',8),('k',6)),3)
+~~~~ 
+val data = spark.sparkContext.parallelize(Array(('k',5),('s',3),('s',4),('p',7),('p',5),('t',8),('k',6)),3)
 val group = data.groupByKey().collect()
-group.foreach(println)`` 
+group.foreach(println)
+~~~~
 
 Entretanto o reduceByKey, existe uma combinação de de chaves identicas é uma partição do cluster, diminuindo a quantidade de dafos, diminuindo o consumo da memória.
 
 Example:
-``val words = Array("one","two","two","four","five","six","six","eight","nine","ten")
+```
+val words = Array("one","two","two","four","five","six","six","eight","nine","ten")
 val data = spark.sparkContext.parallelize(words).map(w => (w,1)).reduceByKey(_+_)
 data.collect.foreach(println)
-``
+```
 
 
 
