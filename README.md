@@ -62,8 +62,9 @@ A linha ``.reduceByKey(_ + _)`` aplica uma ação no RDD acima, a qual combina o
 
 Finalmente, a linha ``counts.saveAsTextFile("hdfs://...")`` salva o RDD counts como um arquivo de texto no hdfs.
 
+## HTTP requests to the NASA Kennedy Space Center WWW server
 
-
+O script foi desenvolvido no Jupyter notebook utilizando python/pyspark e respostas para as questões encontram-se no arquivo ``script/desafio_semantix.ipynb``. Para execução desse teste foi utilizado um cluster Spark/YARN do serviço DataProc da nuvem google.
 
 
 
